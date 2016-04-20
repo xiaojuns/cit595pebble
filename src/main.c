@@ -90,6 +90,11 @@ void in_received_handler(DictionaryIterator *received, void *context) {
       text_layer_set_text(text_layers, movies);
       free(movies);
       movie_index = 0;
+      
+      // send back weather info
+      if (window_state == 3) {
+        weather_sendback();
+      }
     }
   }
 //   if (window_state == 2) { // motion sensor
@@ -146,6 +151,8 @@ static void select_callback(struct MenuLayer *menu_layer,
     const bool animated = true;
     window_stack_push(windows[0], animated);
     text_layer_set_text(text_layers, "Temperature");
+    // send temp command to server
+    send_temp_mode();
   } else if ((int)cell_index->row == 1) { // Movie Info
     // set window state to movie info mode
     window_state = 1;

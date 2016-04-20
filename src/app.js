@@ -21,8 +21,8 @@ above.
 // });
 
 // server
-var ipAddress = "0.0.0.0"; // Hard coded IP address
-var port = "3001"; // Same port specified as argument to server
+// var ipAddress = "192.168.50.103"; // Hard coded IP address
+// var port = "12323"; // Same port specified as argument to server
 
 // for temperature
 var commands = ["current", "average", "high", "low"];
@@ -30,6 +30,9 @@ var commandstyle = ["Celsius", "Fahrenheit"];
 var commandtype = 0;
 var csbool = false;
 var modebool = false;
+
+// for weather
+var temp_c = "No_Data";
 
 
 Pebble.addEventListener("appmessage",
@@ -67,11 +70,17 @@ Pebble.addEventListener("appmessage",
         } else if (e.payload.req_msg == 'movie') {
           sendToServerMovie();
         } else if (e.payload.req_msg == 'motion') {
-          sendToServerTemp("motion");
+          Pebble.sendAppMessage({ "0": "Retrieving data" });
+          sendToServerTemp("proximity");
         } else if (e.payload.req_msg == 'weather') {
           sendToServerWeather();
         }
-        else Pebble.sendAppMessage({ "0": "invalid" });
+        else if (e.payload.req_msg == 'weather_sendback'){
+          sendToServerTemp('weather_sendback/'+temp_c);
+        } else {
+          sendToServerTemp(e.payload.req_msg);
+          //Pebble.sendAppMessage({ "0": "invalid" });
+        }
       } else Pebble.sendAppMessage({ "0": "nokey" });
     } else Pebble.sendAppMessage({ "0": "nopayload" });
   }
@@ -81,23 +90,25 @@ Pebble.addEventListener("appmessage",
 // temperature server
 function sendToServerTemp(request) {
   var req = new XMLHttpRequest();
-//   var ipAddress = "0.0.0.0"; // Hard coded IP address
-//   var port = "3001"; // Same port specified as argument to server
+  var ipAddress = "158.130.110.97"; // Hard coded IP address
+  var port = "3001"; // Same port specified as argument to server
   var url = "http://" + ipAddress + ":" + port + "/";
   var method = "GET";
   var async = true;
   
   req.onload = function(e) {
     // see what came back
-    var msg = "no response";
-    var response = JSON.parse(req.responseText);
-    if (response) {
-      if (response.name) {
-        msg = response.name; // key is name, return value of key
-      } else msg = "noname";
+    if (request[0] != 'w') {
+      var msg = "no response";
+      var response = JSON.parse(req.responseText);
+      if (response) {
+        if (response.name) {
+          msg = response.name; // key is name, return value of key
+        } else msg = "noname";
+      }
+      // sends message back to pebble
+      Pebble.sendAppMessage({ "0": msg });
     }
-    // sends message back to pebble
-    Pebble.sendAppMessage({ "0": msg });
   };
   
   // error handler
@@ -191,6 +202,12 @@ function sendToServerWeather() {
     var response = JSON.parse(req.responseText);
     if (response) {
       if (response.current_observation) {
+        if (response.current_observation.temp_c) {
+          temp_c = response.current_observation.temp_c;
+        } else {
+          temp_c = "No_Data";
+        }
+        
         if (response.current_observation.display_location.city) {
           msg = "City: " + response.current_observation.display_location.city;
         } else {
@@ -220,8 +237,7 @@ function sendToServerWeather() {
         } else {
           msg = "Feels like: " + nodata; 
         }
-        weather_msg.push(msg);
-        
+        weather_msg.push(msg); 
       } else msg = "No Weather Info"; 
     }
     // sends message back to pebble  

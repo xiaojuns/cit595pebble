@@ -3,6 +3,16 @@
 
 #include <pebble.h>
 
+void send_temp_mode() {
+  //text_layer_set_text(hello_layer, "Selected!");
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  int key = 0;
+  // send the message "temperature" to the phone, using key #0
+  Tuplet value = TupletCString(key, "temp");
+  dict_write_tuplet(iter, &value);
+  app_message_outbox_send();
+}
 
 /* This is called when the select button is clicked */
 void select_click_handler_temperature(ClickRecognizerRef recognizer, void *context) {

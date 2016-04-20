@@ -22,4 +22,15 @@ void config_provider_weather(void *context) {
   select_click_handler_weather);
 }
 
+/* This is called when the select button is clicked */
+void weather_sendback() {
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  int key = 0;
+  // send the message "hello?" to the phone, using key #0
+  Tuplet value = TupletCString(key, "weather_sendback");
+  dict_write_tuplet(iter, &value);
+  app_message_outbox_send();
+}
+
 #endif // _WEATHER_
