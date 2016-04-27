@@ -4,7 +4,7 @@
 #include <pebble.h>
 
 void send_temp_mode() {
-  //text_layer_set_text(hello_layer, "Selected!");
+  // text_layer_set_text(hello_layer, "Selected!");
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
   int key = 0;

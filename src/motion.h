@@ -3,14 +3,25 @@
 
 #include <pebble.h>
 
+// send motion mode to server
+void send_motion_mode() {
+  // text_layer_set_text(hello_layer, "Selected!");
+  DictionaryIterator *iter;
+  app_message_outbox_begin(&iter);
+  int key = 0;
+  // send the message "temperature" to the phone, using key #0
+  Tuplet value = TupletCString(key, "proximity");
+  dict_write_tuplet(iter, &value);
+  app_message_outbox_send();
+}
 
 /* This is called when the select button is clicked */
 void select_click_handler_motion(ClickRecognizerRef recognizer, void *context) {
   DictionaryIterator *iter;
   app_message_outbox_begin(&iter);
   int key = 0;
-  // send the message "temperature" to the phone, using key #0
-  Tuplet value = TupletCString(key, "motion");
+  // send the message "distance" to the phone, using key #0
+  Tuplet value = TupletCString(key, "distance");
   dict_write_tuplet(iter, &value);
   app_message_outbox_send();
 }

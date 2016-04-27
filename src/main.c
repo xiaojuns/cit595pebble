@@ -73,7 +73,7 @@ void in_received_handler(DictionaryIterator *received, void *context) {
       } else {
         text_layer_set_text(text_layers, "no value!");
       }
-      text_layer_set_text(text_layers, "Retrieving data");
+//       text_layer_set_text(text_layers, "Retrieving data");
     } else {
       text_layer_set_text(text_layers, "no message!");
     }
@@ -167,13 +167,15 @@ static void select_callback(struct MenuLayer *menu_layer,
     const bool animated = true;
     window_stack_push(windows[2], animated);
     text_layer_set_text(text_layers, "Motion Sensor");
+    // send motion command to server
+    send_motion_mode();
   } else if ((int)cell_index->row == 3) { // Weather
     // set window state to weather mode
     window_state = 3;
     // push weather window to the window stack
     const bool animated = true;
     window_stack_push(windows[3], animated);
-    text_layer_set_text(text_layers, "Weather Info");
+    text_layer_set_text(text_layers, "Weather Info");   
   }
 }
 

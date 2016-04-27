@@ -1,28 +1,7 @@
-/**
-This code listens for an "appmessage" coming from the watch, and then calls the function
-that is specified. The variable "e.payload" includes the message that was received, and we
-can get the message using "e.payload.hello_msg". Note that here we use the key
-"hello_msg", which was mapped to index #0 (used by the C code) in our configuration
-above.
-**/
-// Pebble.addEventListener("appmessage",
-//   function(e) {
-//     if (e.payload) {
-//       if (e.payload.hello_msg) {
-//         Pebble.sendAppMessage({ "0": "Recvd: " + e.payload.hello_msg });
-//       } else Pebble.sendAppMessage({ "0": "nokey" });
-//     } else Pebble.sendAppMessage({ "0": "nopayload" });
-//   }
-// );
 
-// Pebble.addEventListener('ready', function() {
-//   // PebbleKit JS is ready!
-//   console.log('PebbleKit JS ready!');
-// });
+var ipAddress = "158.130.109.200"; // Hard coded IP address
+var port = "3001"; // Same port specified as argument to server
 
-// server
-// var ipAddress = "192.168.50.103"; // Hard coded IP address
-// var port = "12323"; // Same port specified as argument to server
 
 // for temperature
 var commands = ["current", "average", "high", "low"];
@@ -69,9 +48,8 @@ Pebble.addEventListener("appmessage",
         // ask for movie information
         } else if (e.payload.req_msg == 'movie') {
           sendToServerMovie();
-        } else if (e.payload.req_msg == 'motion') {
-          Pebble.sendAppMessage({ "0": "Retrieving data" });
-          sendToServerTemp("proximity");
+        } else if (e.payload.req_msg == 'distance') {
+          sendToServerTemp(e.payload.req_msg);
         } else if (e.payload.req_msg == 'weather') {
           sendToServerWeather();
         }
@@ -90,8 +68,8 @@ Pebble.addEventListener("appmessage",
 // temperature server
 function sendToServerTemp(request) {
   var req = new XMLHttpRequest();
-  var ipAddress = "158.130.110.97"; // Hard coded IP address
-  var port = "3001"; // Same port specified as argument to server
+//   var ipAddress = "158.130.213.233"; // Hard coded IP address
+//   var port = "3001"; // Same port specified as argument to server
   var url = "http://" + ipAddress + ":" + port + "/";
   var method = "GET";
   var async = true;
@@ -113,7 +91,9 @@ function sendToServerTemp(request) {
   
   // error handler
   req.onerror = function() {
-    Pebble.sendAppMessage({"0": "Couldn't connect to server."});
+    if (request[0] != 'w') {
+     Pebble.sendAppMessage({"0": "Couldn't connect to server."});
+    }
   }
   
   req.open(method, url + request, async);
